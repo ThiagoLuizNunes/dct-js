@@ -1,4 +1,4 @@
-# DCT(Discrete Cosine Transform)- Python
+## DCT(Discrete Cosine Transform)- Python ##
 
 Toolkit: Python2 | pip | pydub | ffmpeg
 
