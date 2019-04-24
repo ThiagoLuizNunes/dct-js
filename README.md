@@ -7,8 +7,9 @@ Toolkit: Python2 | pip | pydub | ffmpeg
  * **[Python 2.7]**
  * **[pip]**
  * **[ffmpeg]**
- * **[pydub]**
-
+ * **[numpy]**
+ * **[scipy]**
+ * **[PIL]**
 
 ### Install dependencies ###
 
@@ -17,8 +18,7 @@ Toolkit: Python2 | pip | pydub | ffmpeg
 1. `sudo apt-get install python2.7`
 2. `sudo sudo apt install python2-pip`
 3. `sudo apt-get install ffmpeg libavcodec-extra`
-4. `pip install pydub`
-
+4. `python -m pip install --user numpy scipy PIL`
 
 ### Run application ###
-`python split.py`
+`python dct.py`
