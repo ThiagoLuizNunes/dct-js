@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from math import pi, sin, cos, radians
 from scipy.io import wavfile
 from scipy.fftpack import dct
 from scipy.fftpack import idct
@@ -8,7 +9,6 @@ import array as arr
 import math
 import wave
 import struct
-
 # DCT Audio
 
 
@@ -25,15 +25,15 @@ def openAudio():
     return arrayAudioFrames
 
 
-def getImportantCosines(array_frames, cosine_rate):
-    rate = cosine_rate
-    importantCosines = arr.array('i')
+# def getImportantCosines(array_frames, cosine_rate):
+#     rate = cosine_rate
+#     importantCosines = arr.array('i')
 
-    for i in range(0, length):
-        waveData = waveFile.readframes(i)
-        data = struct.unpack('<h', waveData)
-        if abs(int(data[0])) > rate:
-            importantCosines.append(int(data[0]))
+#     for i in range(0, length):
+#         waveData = waveFile.readframes(i)
+#         data = struct.unpack('<h', waveData)
+#         if abs(int(data[0])) > rate:
+#             importantCosines.append(int(data[0]))
 
 
 def showDCTGraph(dcts):
@@ -45,17 +45,30 @@ def showDCTGraph(dcts):
     plt.show()
 
 
-def applayDCTinAudio(matrix):
-    N = len(matrix)
-    output = []
+def applayDCTinAudio(frames):
+    # N = len(frames)
+    N = 8
 
     for k in range(0, N):
-        alfa = math.sqrt(1.0/N) if k == 0 else math.sqrt(2.0/N)
-        cosine_sum = 0.0
+        ck = math.sqrt(0.5) if k == 0 else 1
+        Ak = math.sqrt(2.0/N)
+        Xk = frames[k]
+        samples = np.zeros(N)
+        # print('Frame value: ', frames[k])
+        # print('ck value: ', ck)
+        # print('Ak value: ', Ak)
+        # print('Xk value: ', Xk)
+
         for n in range(0, N):
-            cosine_sum += matrix[n] * \
-                math.cos((math.pi * (2.0 * n + 1.0) * k) / (2.0 * N))
-        output.append(alfa * cosine_sum)
+          samples[n] = Ak * ck * Xk * cos(radians(((2 * pi * k * n)/2*N) + ((k * pi)/2*N)))
+
+        if k == 3:
+          arr = np.arange(N)
+          plt.plot(arr, samples)
+          plt.xlabel('x - axis')
+          plt.ylabel('y - axis')
+          plt.title('DC')
+          plt.show()
     # dct_frames = arr.array('f')
     # N = len(array_frames)
     # for n in range(0, N):
@@ -74,7 +87,8 @@ def applayDCTinAudio(matrix):
 
 if __name__ == '__main__':
     frames = openAudio()
-    showDCTGraph(frames)
+    applayDCTinAudio(frames)
+    # showDCTGraph(frames)
     # applayDCTinAudio(frames)
     # newArrayDCT = dct(arrayAudioFrames, norm = 'ortho')
 
