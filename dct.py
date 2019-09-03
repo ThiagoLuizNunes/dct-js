@@ -1,18 +1,16 @@
-import numpy as np
-import matplotlib.pyplot as plt
-from math import pi, sin, cos, radians
-from scipy.io import wavfile
-from scipy.fftpack import dct
-from scipy.fftpack import idct
-from PIL import Image
-import array as arr
-import math
+import sys
 import wave
 import struct
+import numpy as np
+import matplotlib.pyplot as plt
+from math import pi, sin, cos, radians, sqrt
+from scipy.io import wavfile
+from PIL import Image
+import array as arr
 # DCT Audio
 
 
-def openAudio():
+def openAudio(rate):
     waveFile = wave.open('audio.wav', 'r')
     # rate = waveFile.getframerate()
     length = waveFile.getnframes()
@@ -21,19 +19,9 @@ def openAudio():
     for i in range(0, length):
         waveData = waveFile.readframes(1)
         data = struct.unpack('<h', waveData)
-        arrayAudioFrames.append(int(data[0]))
+        if abs(int(data[0])) > rate:
+            arrayAudioFrames.append(int(data[0]))
     return arrayAudioFrames
-
-
-# def getImportantCosines(array_frames, cosine_rate):
-#     rate = cosine_rate
-#     importantCosines = arr.array('i')
-
-#     for i in range(0, length):
-#         waveData = waveFile.readframes(i)
-#         data = struct.unpack('<h', waveData)
-#         if abs(int(data[0])) > rate:
-#             importantCosines.append(int(data[0]))
 
 
 def showDCTGraph(dcts):
@@ -46,47 +34,35 @@ def showDCTGraph(dcts):
 
 
 def applayDCTinAudio(frames):
-    # N = len(frames)
-    N = 8
-
+    N = len(frames)
+    print(N)
+    cosines = np.zeros(N)
+    # N = 8
+    # ex = [10, 5, 8.5, 2, 1, 1.5, 0, 0.1]
     for k in range(0, N):
-        ck = math.sqrt(0.5) if k == 0 else 1
-        Ak = math.sqrt(2.0/N)
+        ck = sqrt(0.5) if k == 0 else 1
+        Ak = sqrt(2/N)
         Xk = frames[k]
         samples = np.zeros(N)
-        # print('Frame value: ', frames[k])
-        # print('ck value: ', ck)
-        # print('Ak value: ', Ak)
-        # print('Xk value: ', Xk)
+        # Xk = ex[k]
 
         for n in range(0, N):
-          samples[n] = Ak * ck * Xk * cos(radians(((2 * pi * k * n)/2*N) + ((k * pi)/2*N)))
+            samples[n] = Ak * ck * Xk * \
+                cos(radians(((2*pi*k*n)/2*N) + ((k*pi)/2*N)))
+            cosines[n] = cosines[n] + samples[n]
 
-        if k == 3:
-          arr = np.arange(N)
-          plt.plot(arr, samples)
-          plt.xlabel('x - axis')
-          plt.ylabel('y - axis')
-          plt.title('DC')
-          plt.show()
-    # dct_frames = arr.array('f')
-    # N = len(array_frames)
-    # for n in range(0, N):
-    #   print('Amostra', n)
-    #   aux = arr.array('f')
-    #   Xk = array_frames[n]
-    #   for k in range(0, N):
-    #     ck = math.sqrt(1/2) if k == 0 else 1
-    #     aux.append((2/N) * ck * Xk * math.cos((2*math.pi*k*n/2*N) + (k*math.pi/2*N)))
-    #   if n == 0:
-    #     dct_frames = aux
-    #   else:
-    #     for i in range(0, N):
-    #       dct_frames[i] += aux[i]
+    arr = np.arange(N)
+    plt.plot(arr, cosines)
+    plt.xlabel('x - axis')
+    plt.ylabel('y - axis')
+    plt.title('DCT')
+    plt.show()
 
 
 if __name__ == '__main__':
-    frames = openAudio()
+    rate = sys.argv[1]
+    print(rate)
+    frames = openAudio(int(rate))
     applayDCTinAudio(frames)
     # showDCTGraph(frames)
     # applayDCTinAudio(frames)
