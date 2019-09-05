@@ -10,8 +10,9 @@ import array as arr
 # DCT Audio
 
 
-def openAudio(rate):
-    waveFile = wave.open('audio.wav', 'r')
+# def openAudio(rate):
+def openAudio(path):
+    waveFile = wave.open(path, 'r')
     # rate = waveFile.getframerate()
     length = waveFile.getnframes()
     arrayAudioFrames = arr.array('i')
@@ -19,21 +20,38 @@ def openAudio(rate):
     for i in range(0, length):
         waveData = waveFile.readframes(1)
         data = struct.unpack('<h', waveData)
-        if abs(int(data[0])) > rate:
-            arrayAudioFrames.append(int(data[0]))
+        # if abs(int(data[0])) > rate:
+        arrayAudioFrames.append(int(data[0]))
     return arrayAudioFrames
 
 
-def showDCTGraph(dcts):
-    arr = np.arange(len(dcts))
-    plt.plot(arr, dcts)
+def showGraph(label, cosines):
+    arr = np.arange(len(cosines))
+    plt.plot(arr, cosines)
     plt.xlabel('x - axis')
     plt.ylabel('y - axis')
-    plt.title('DCT graph')
+    plt.title(label)
     plt.show()
 
 
-def applayDCTinAudio(frames):
+def showDCLevel(frames):
+    N = len(frames)
+    cosines = np.zeros(N)
+    for k in range(0, 1):
+        ck = sqrt(0.5) if k == 0 else 1
+        Ak = sqrt(2/N)
+        Xk = frames[k]
+        samples = np.zeros(N)
+
+        for n in range(0, N):
+            samples[n] = Ak * ck * Xk * \
+                cos(radians(((2*pi*k*n)/2*N) + ((k*pi)/2*N)))
+            cosines[n] = cosines[n] + samples[n]
+
+    showGraph('DC Level', cosines)
+
+
+def applyDCTinAudio(frames):
     N = len(frames)
     print(N)
     cosines = np.zeros(N)
@@ -51,19 +69,17 @@ def applayDCTinAudio(frames):
                 cos(radians(((2*pi*k*n)/2*N) + ((k*pi)/2*N)))
             cosines[n] = cosines[n] + samples[n]
 
-    arr = np.arange(N)
-    plt.plot(arr, cosines)
-    plt.xlabel('x - axis')
-    plt.ylabel('y - axis')
-    plt.title('DCT')
-    plt.show()
+    return cosines
+
+
+# def applyIDCTAudio(cosines):
 
 
 if __name__ == '__main__':
-    rate = sys.argv[1]
-    print(rate)
-    frames = openAudio(int(rate))
-    applayDCTinAudio(frames)
+    path = sys.argv[1]
+    frames = openAudio(path)
+    showDCLevel(frames)
+    # applayDCTinAudio(frames)
     # showDCTGraph(frames)
     # applayDCTinAudio(frames)
     # newArrayDCT = dct(arrayAudioFrames, norm = 'ortho')
