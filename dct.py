@@ -2,94 +2,64 @@ import sys
 import wave
 import struct
 import numpy as np
-import matplotlib.pyplot as plt
 from math import pi, sin, cos, radians, sqrt
-from scipy.io import wavfile
-from PIL import Image
 import array as arr
-# DCT Audio
+from modules import helper as hp
 
 
-# def openAudio(rate):
-def openAudio(path):
-    waveFile = wave.open(path, 'r')
-    # rate = waveFile.getframerate()
-    length = waveFile.getnframes()
-    arrayAudioFrames = arr.array('i')
+def applyDCTinAudio(signal):
+    N = len(signal)
+    cosines = np.zeros(N).astype(float)
 
-    for i in range(0, length):
-        waveData = waveFile.readframes(1)
-        data = struct.unpack('<h', waveData)
-        # if abs(int(data[0])) > rate:
-        arrayAudioFrames.append(int(data[0]))
-    return arrayAudioFrames
-
-
-def showGraph(label, cosines):
-    arr = np.arange(len(cosines))
-    plt.plot(arr, cosines)
-    plt.xlabel('x - axis')
-    plt.ylabel('y - axis')
-    plt.title(label)
-    plt.show()
-
-
-def showDCLevel(frames):
-    N = len(frames)
-    cosines = np.zeros(N)
-    for k in range(0, 1):
-        ck = sqrt(0.5) if k == 0 else 1
-        Ak = sqrt(2/N)
-        Xk = frames[k]
-        samples = np.zeros(N)
-
-        for n in range(0, N):
-            samples[n] = Ak * ck * Xk * \
-                cos(radians(((2*pi*k*n)/2*N) + ((k*pi)/2*N)))
-            cosines[n] = cosines[n] + samples[n]
-
-    showGraph('DC Level', cosines)
-
-
-def applyDCTinAudio(frames):
-    N = len(frames)
-    print(N)
-    cosines = np.zeros(N)
-    # N = 8
-    # ex = [10, 5, 8.5, 2, 1, 1.5, 0, 0.1]
     for k in range(0, N):
-        ck = sqrt(0.5) if k == 0 else 1
+        alpha = sqrt(0.5) if k == 0 else 1
         Ak = sqrt(2/N)
-        Xk = frames[k]
-        samples = np.zeros(N)
-        # Xk = ex[k]
+        xn = signal[k]
+        samples = np.zeros(N).astype(float)
 
         for n in range(0, N):
-            samples[n] = Ak * ck * Xk * \
+            samples[n] = Ak * alpha * xn * \
                 cos(radians(((2*pi*k*n)/2*N) + ((k*pi)/2*N)))
             cosines[n] = cosines[n] + samples[n]
 
     return cosines
 
 
-# def applyIDCTAudio(cosines):
+def applyIDCTinAudio(cosines):
+    N = len(cosines)
+    signal = np.zeros(N).astype(float)
+    for n in range(0, N):
+        Ak = sqrt(2/N)
+        Xk = cosines[n]
+        samples = np.zeros(N).astype(float)
+
+        for k in range(0, N):
+            alpha = sqrt(0.5) if k == 0 else 1
+            samples[k] = Ak * alpha * Xk * \
+                cos(radians(((2*pi*k*n)/2*N) + ((k*pi)/2*N)))
+            signal[k] = signal[k] + samples[k]
+
+    return signal
+
+
 
 
 if __name__ == '__main__':
     path = sys.argv[1]
-    frames = openAudio(path)
-    showDCLevel(frames)
-    # applayDCTinAudio(frames)
-    # showDCTGraph(frames)
-    # applayDCTinAudio(frames)
+    rate, frames = hp.openAudio(path)
+    # ek = [10, 5, 8.5, 2, 1, 1.5, 0, 0.1]
+
+    signal = applyDCTinAudio(frames)
+    cosines = applyIDCTinAudio(signal)
+    # print(cosines)
+    hp.createAudio('new-audio', rate, cosines)
+    # hp.showGraph('DCT', signal)
+    # hp.showGraph('IDCT', cosines)
+
     # newArrayDCT = dct(arrayAudioFrames, norm = 'ortho')
 
     # newArrayIDCT = idct(newArrayDCT, norm = 'ortho')
     # newArrayIDCT = newArrayIDCT.astype('int16')
-
-    # wavfile.write('audio-idct.wav', rate , newArrayIDCT)
-    # wavfile.write('audio-idct-chunked.wav', rate , newArrayIDCTChunked)
-    # wavfile.write('audio-idct-robot.wav', rate , newArrayIDCTRobot)
 
     # DCT Image
     # img = Image.open('lena.bmp')
