@@ -12,17 +12,12 @@ def applyIDCTinAudio(cosines):
     signal = np.zeros(N).astype(float)
 
     Ak = sqrt(2/N)
-    for k in range(0, N):
-        Xk = cosines[k]
-        samples = np.zeros(N).astype(float)
-        alpha = sqrt(0.5) if k == 0 else 1
-
-        for n in range(0, N):
-            samples[n] = Ak * alpha * Xk * \
-                cos(radians(((2*pi*k*n)/2*N) + ((k*pi)/2*N)))
-            signal[n] += samples[n]
-
-    # hp.coeffStrategyOne(cosines, amount)
+    for n in range(0, N):
+        _sum = 0
+        for k in range(0, N):
+            ck = sqrt(0.5) if k == 0 else 1
+            _sum +=  ck * cosines[k] * cos(radians(((2*pi*k*n)/2*N) + ((k*pi)/2*N)))
+        signal[n] *= Ak * _sum
 
     return signal
 
@@ -33,16 +28,13 @@ def applyDCTinAudio(signal):
 
     Ak = sqrt(2/N)
 
-    for n in range(0, N):
-        xn = signal[n]
-        samples = np.zeros(N).astype(float)
-
-        for k in range(0, N):
-            alpha = sqrt(0.5) if n == 0 else 1
-            samples[k] = Ak * alpha * xn * \
-                cos(radians(((2*pi*k*n)/2*N) + ((k*pi)/2*N)))
-            cosines[k] += samples[k]
-
+    for k in range(0, N):
+        ck = sqrt(0.5) if k == 0 else 1
+        _sum = 0
+        for n in range(0, N):
+            _sum += signal[n] * cos(radians(((2*pi*k*n)/2*N) + ((k*pi)/2*N)))
+        _sum *= ck * Ak
+        cosines[k] = _sum
     return cosines
 
 
@@ -51,12 +43,10 @@ if __name__ == '__main__':
     amount = sys.argv[2]
     rate, frames = hp.openAudio(path)
     ekCosines = [10, 5, 8.5, 2, 1, 1.5, 0, 0.1]
-    # ekSignal = [11.27835905, 5.00920938, 1.58139772, -0.10615071, -0.13384486, 2.87767395, 4.18172419, 4.06081887]
 
     signal = applyIDCTinAudio(ekCosines)
     cosines = applyDCTinAudio(signal)
     print(signal)
-    hp.showGraph('Cosines', signal)
     print(cosines)
     hp.showGraph('Signal', cosines)
     # hp.createAudio('coeff', rate, cosines)
