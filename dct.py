@@ -7,7 +7,7 @@ import array as arr
 from modules import helper as hp
 
 
-def applyDCTinAudio(signal):
+def applyDCTinAudio(signal, amount=0):
     N = len(signal)
     cosines = np.zeros(N).astype(float)
 
@@ -21,6 +21,8 @@ def applyDCTinAudio(signal):
             samples[n] = Ak * alpha * xn * \
                 cos(radians(((2*pi*k*n)/2*N) + ((k*pi)/2*N)))
             cosines[n] = cosines[n] + samples[n]
+
+    hp.coeffStrategyOne(cosines, amount)
 
     return cosines
 
@@ -42,17 +44,16 @@ def applyIDCTinAudio(cosines):
     return signal
 
 
-
-
 if __name__ == '__main__':
     path = sys.argv[1]
+    amount = sys.argv[2]
     rate, frames = hp.openAudio(path)
     # ek = [10, 5, 8.5, 2, 1, 1.5, 0, 0.1]
 
-    signal = applyDCTinAudio(frames)
+    signal = applyDCTinAudio(frames, amount)
     cosines = applyIDCTinAudio(signal)
     # print(cosines)
-    hp.createAudio('new-audio', rate, cosines)
+    hp.createAudio('coeff', rate, cosines)
     # hp.showGraph('DCT', signal)
     # hp.showGraph('IDCT', cosines)
 

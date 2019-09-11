@@ -6,6 +6,7 @@ from scipy.io import wavfile
 from PIL import Image
 import array as arr
 
+
 def openAudio(path):
     waveFile = wave.open(path, 'r')
     rate = waveFile.getframerate()
@@ -27,5 +28,25 @@ def showGraph(label, cosines):
     plt.title(label)
     plt.show()
 
+
+def coeffStrategyOne(cosines, amount):
+    N = len(cosines)
+    coeff = np.zeros(int(amount)).astype(float)
+    if int(amount) > 0:
+        amountSize = int(int(amount)/2)
+        cosines.sort()
+        for i in range(0, amountSize):
+            coeff[i] = cosines[i]
+        for j in range(0, amountSize):
+            coeff[amountSize + j] = cosines[N-1-j]
+        showGraph('Most important coefficients', coeff)
+
+
+def coeffStrategyTwo(cosines, amount):
+    N = len(cosines)
+    coeff = np.zeros(int(amount)).astype(float)
+    # if int(amount) > 0:
+
+
 def createAudio(name, rate, frames):
-    wavfile.write('bin/'+ name + '.waw', rate, frames)
+    wavfile.write('bin/' + name + '.waw', rate, frames)
