@@ -42,11 +42,25 @@ def coeffStrategyOne(cosines, amount):
         showGraph('Most important coefficients', coeff)
 
 
+class Cosine:
+  def __init__(self, value, index):
+    self.value = value
+    self.index = index
+
+
 def coeffStrategyTwo(cosines, amount):
     N = len(cosines)
-    coeff = np.zeros(int(amount)).astype(float)
-    # if int(amount) > 0:
+
+    cosinesList = []
+    if int(amount) > 0:
+      for i in range(0, N):
+        # cosinesList.append([i, cosines[i]])
+        cosine = Cosine(cosines[i], i)
+        cosinesList.append(cosine)
+
+      print(cosinesList)
+
 
 
 def createAudio(name, rate, frames):
-    wavfile.write('bin/' + name + '.waw', rate, frames)
+    wavfile.write('build/' + name + '.waw', rate, frames)
