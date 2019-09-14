@@ -1,10 +1,10 @@
 import sys
-import math
 import numpy as np
 from modules import helper as hp
+from math import sqrt, cos, pi
 
 def ck(k):
-    return math.sqrt(0.5) if k == 0 else 1
+    return sqrt(0.5) if k == 0 else 1
 
 
 def freq(n, k):
@@ -12,7 +12,7 @@ def freq(n, k):
 
 
 def theta(n, k):
-    return (k * math.pi) / (2.0 * n)
+    return (k * pi) / (2.0 * n)
 
 
 def applyDCT(signals):
@@ -32,9 +32,9 @@ def applyDCT(signals):
         # Through all signals
         for i in range(n):
             _sum += signals[i] * \
-                math.cos(2 * math.pi * freq(n, k) * i + theta(n, k))
+                cos(2 * pi * freq(n, k) * i + theta(n, k))
 
-        new_signals[k] = math.sqrt(2.0 / n) * ck(k) * _sum
+        new_signals[k] = sqrt(2.0 / n) * ck(k) * _sum
 
     return new_signals
 
@@ -53,10 +53,10 @@ def applyIDCT(signals):
         _sum = 0
         # Through cosines
         for k in range(n):
-            _sum += ck(k) * signals[k] * math.cos(2 *
-                                                  math.pi * freq(n, k) * i + theta(n, k))
+            _sum += ck(k) * signals[k] * cos(2 *
+                                                  pi * freq(n, k) * i + theta(n, k))
 
-        new_signals[i] = math.sqrt(2.0 / n) * _sum
+        new_signals[i] = sqrt(2.0 / n) * _sum
 
     return new_signals
 
@@ -138,8 +138,7 @@ if __name__ == '__main__':
     # hp.showGraph('Signal', cosines)
 
     cosines = applyDCT(frames)
-    hp.coeffStrategyTwo(cosines, amount)
-    # signal = applyIDCT(cosines)
-    # hp.showGraph('Cosines', cosines)
-    # hp.showGraph('Signal', signal)
-    # hp.createAudio('coeff', rate, signal)
+    mostCosines = hp.mostImportantsCoeff(cosines, amount)
+    hp.showGraph('Most importants cosines', mostCosines)
+    signal = applyIDCT(mostCosines)
+    hp.createAudio('coeff', rate, signal)

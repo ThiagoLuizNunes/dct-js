@@ -43,23 +43,40 @@ def coeffStrategyOne(cosines, amount):
 
 
 class Cosine:
-  def __init__(self, value, index):
-    self.value = value
-    self.index = index
+    def __init__(self, value, index):
+        self.value = value
+        self.index = index
 
 
-def coeffStrategyTwo(cosines, amount):
+def getValue(elem):
+    return abs(elem.value)
+
+
+def getIndex(elem):
+    return abs(elem.index)
+
+
+def mostImportantsCoeff(cosines, amount):
     N = len(cosines)
 
     cosinesList = []
+    mostImportants = []
     if int(amount) > 0:
-      for i in range(0, N):
-        # cosinesList.append([i, cosines[i]])
-        cosine = Cosine(cosines[i], i)
-        cosinesList.append(cosine)
+        for i in range(0, N):
+            cosine = Cosine(cosines[i], i)
+            cosinesList.append(cosine)
+        cosinesList.sort(key=getValue)
+        cosinesList.reverse()
 
-      print(cosinesList)
+        for x in range(0, N):
+            if x > int(amount):
+                cosinesList[x].value = 0
+        cosinesList.sort(key=getIndex)
 
+        for c in range(0, N):
+            mostImportants.append(cosinesList[c].value)
+
+    return mostImportants
 
 
 def createAudio(name, rate, frames):
