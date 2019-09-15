@@ -2,9 +2,10 @@ import wave
 import struct
 import numpy as np
 import matplotlib.pyplot as plt
+import array as arr
+import cv2 as cv
 from scipy.io import wavfile
 from PIL import Image
-import array as arr
 
 
 def openAudio(path):
@@ -19,6 +20,8 @@ def openAudio(path):
         arrayAudioFrames.append(int(data[0]))
     return rate, arrayAudioFrames
 
+def openImage(path):
+    return cv.imread(path)
 
 def showGraph(label, cosines):
     arr = np.arange(len(cosines))
@@ -81,3 +84,6 @@ def mostImportantsCoeff(cosines, amount):
 
 def createAudio(name, rate, frames):
     wavfile.write('build/' + name + '.waw', rate, frames)
+
+def createImage(name, frames):
+    cv.imwrite('build/' + name + '.bmp', frames)

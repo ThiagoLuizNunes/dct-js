@@ -53,8 +53,7 @@ def applyIDCT(signals):
         _sum = 0
         # Through cosines
         for k in range(n):
-            _sum += ck(k) * signals[k] * cos(2 *
-                                                  pi * freq(n, k) * i + theta(n, k))
+            _sum += ck(k) * signals[k] * cos(2 * pi * freq(n, k) * i + theta(n, k))
 
         new_signals[i] = sqrt(2.0 / n) * _sum
 
@@ -128,7 +127,19 @@ def applyDCT2D(signals, coef=0):
 if __name__ == '__main__':
     path = sys.argv[1]
     amount = sys.argv[2]
-    rate, frames = hp.openAudio(path)
+
+    if ('.bmp' in path) or ('.jpg' in path):
+        frames = hp.openImage(path)
+        cosines = applyDCT2D(frames)
+        signal = applyIDCT2D(cosines)
+        hp.createImage('coeff', signal)
+    if '.wav' in path:
+        rate, frames = hp.openAudio(path)
+        cosines = applyDCT(frames)
+        mostCosines = hp.mostImportantsCoeff(cosines, amount)
+        hp.showGraph('Most importants cosines', mostCosines)
+        signal = applyIDCT(mostCosines)
+        hp.createAudio('coeff', rate, signal)
 
     # ekCosines = [10, 5, 8.5, 2, 1, 1.5, 0, 0.1]
     # signal = applyIDCT(ekCosines)
@@ -137,8 +148,4 @@ if __name__ == '__main__':
     # print('Cosines:', cosines)
     # hp.showGraph('Signal', cosines)
 
-    cosines = applyDCT(frames)
-    mostCosines = hp.mostImportantsCoeff(cosines, amount)
-    hp.showGraph('Most importants cosines', mostCosines)
-    signal = applyIDCT(mostCosines)
-    hp.createAudio('coeff', rate, signal)
+
