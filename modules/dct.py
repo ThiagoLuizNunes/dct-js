@@ -1,6 +1,4 @@
-import sys
 import numpy as np
-from modules import helper as hp
 from math import sqrt, cos, pi
 
 def ck(k):
@@ -78,30 +76,14 @@ def applyDCT2D(signal):
 
     return signal_2
 
-if __name__ == '__main__':
-    path = sys.argv[1]
-    amount = sys.argv[2]
+def deslocateFreq(cosines, inc):
+    N = len(cosines)
+    deslocateCosines = np.zeros_like(cosines).astype(float)
 
-    if ('.bmp' in path) or ('.jpg' in path):
-        frames = hp.openImage(path)
-        cosines = applyDCT2D(frames)
-        mostCosines2D = hp.mostImportantsCoeff2D(cosines, amount)
-        hp.createImage('dct', mostCosines2D)
-        signal = applyIDCT2D(mostCosines2D)
-        hp.createImage('coeff', signal)
-    if '.wav' in path:
-        rate, frames = hp.openAudio(path)
-        cosines = applyDCT(frames)
-        mostCosines = hp.mostImportantsCoeff(cosines, amount)
-        hp.showGraph('Most importants cosines', mostCosines)
-        signal = applyIDCT(mostCosines)
-        hp.createAudio('coeff', rate, signal)
+    for i in range(0, N):
+        if i + int(inc) < N:
+          deslocateCosines[i] = cosines[i + int(inc)]
+        else:
+          deslocateCosines[i] = 0
 
-    # ekCosines = [10, 5, 8.5, 2, 1, 1.5, 0, 0.1]
-    # signal = applyIDCT(ekCosines)
-    # cosines = applyDCT(signal)
-    # print('Signal:', signal)
-    # print('Cosines:', cosines)
-    # hp.showGraph('Signal', cosines)
-
-
+    return deslocateCosines
